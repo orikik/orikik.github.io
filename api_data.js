@@ -1,66 +1,196 @@
 define({ "api": [
   {
-    "success": {
+    "type": "post",
+    "url": "/remove",
+    "title": "User deletion",
+    "name": "DelUser1",
+    "group": "1__User",
+    "parameter": {
       "fields": {
-        "Success 200": [
+        "Parameter": [
           {
-            "group": "Success 200",
-            "optional": false,
-            "field": "varname1",
-            "description": "<p>No type.</p>"
-          },
-          {
-            "group": "Success 200",
+            "group": "Parameter",
             "type": "String",
             "optional": false,
-            "field": "varname2",
-            "description": "<p>With type.</p>"
+            "field": "username",
+            "description": "<p>Users name</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "password",
+            "description": "<p>Users password</p>"
           }
         ]
       }
     },
-    "type": "",
-    "url": "",
     "version": "0.0.0",
-    "filename": "./doc/doc/main.js",
-    "group": "C__work_shemesh_doc_doc_main_js",
-    "groupTitle": "C__work_shemesh_doc_doc_main_js",
-    "name": ""
+    "filename": "./app/remove.py",
+    "groupTitle": "1__User"
   },
   {
+    "type": "get",
+    "url": "/remove",
+    "title": "User deletion",
+    "name": "DelUser2",
+    "group": "1__User",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "cookie",
+            "description": "<p>Users cookie(automatically)</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "./app/remove.py",
+    "groupTitle": "1__User"
+  },
+  {
+    "type": "post",
+    "url": "/registration",
+    "title": "New User Registration",
+    "name": "GetUser",
+    "group": "1__User",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "username",
+            "description": "<p>Users name</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "password",
+            "description": "<p>Users password</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "./app/registration.py",
+    "groupTitle": "1__User"
+  },
+  {
+    "type": "post",
+    "url": "/login",
+    "title": "User login",
+    "name": "LoginUser",
+    "group": "1__User",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "username",
+            "description": "<p>Users name</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "password",
+            "description": "<p>Users password</p>"
+          }
+        ]
+      }
+    },
     "success": {
       "fields": {
         "Success 200": [
           {
             "group": "Success 200",
-            "optional": false,
-            "field": "varname1",
-            "description": "<p>No type.</p>"
-          },
-          {
-            "group": "Success 200",
             "type": "String",
             "optional": false,
-            "field": "varname2",
-            "description": "<p>With type.</p>"
+            "field": "cookie",
+            "description": "<p>Users cookie</p>"
           }
         ]
       }
     },
-    "type": "",
-    "url": "",
     "version": "0.0.0",
-    "filename": "./doc/main.js",
-    "group": "C__work_shemesh_doc_main_js",
-    "groupTitle": "C__work_shemesh_doc_main_js",
-    "name": ""
+    "filename": "./app/login.py",
+    "groupTitle": "1__User"
+  },
+  {
+    "type": "get, post",
+    "url": "/logout",
+    "title": "User logout",
+    "name": "LogoutUser",
+    "group": "1__User",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "cookie",
+            "description": "<p>Users cookie(automatically)</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "./app/logout.py",
+    "groupTitle": "1__User"
+  },
+  {
+    "type": "post",
+    "url": "/update",
+    "title": "User update",
+    "name": "UpdateUser",
+    "group": "1__User",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "cookie",
+            "description": "<p>Users cookie(automatically)</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": true,
+            "field": "username",
+            "description": "<p>Users new name</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": true,
+            "field": "password",
+            "description": "<p>Users new password</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "./app/update.py",
+    "groupTitle": "1__User"
   },
   {
     "type": "post",
     "url": "/new_name_dir",
     "title": "Change the name of the directory",
     "name": "ChangeDir",
-    "group": "Directories",
+    "group": "2__Directories",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -97,14 +227,14 @@ define({ "api": [
     },
     "version": "0.0.0",
     "filename": "./app/directory_change_name.py",
-    "groupTitle": "Directories"
+    "groupTitle": "2__Directories"
   },
   {
     "type": "post",
     "url": "/get_dir",
     "title": "List of files in the directory",
     "name": "GetFilesDir",
-    "group": "Directories",
+    "group": "2__Directories",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -134,14 +264,14 @@ define({ "api": [
     },
     "version": "0.0.0",
     "filename": "./app/directory_getNameFiles.py",
-    "groupTitle": "Directories"
+    "groupTitle": "2__Directories"
   },
   {
     "type": "post",
     "url": "/new_dir",
     "title": "Create a new directory",
     "name": "NewDir",
-    "group": "Directories",
+    "group": "2__Directories",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -171,14 +301,14 @@ define({ "api": [
     },
     "version": "0.0.0",
     "filename": "./app/directory_new.py",
-    "groupTitle": "Directories"
+    "groupTitle": "2__Directories"
   },
   {
     "type": "post",
     "url": "/remove_dir",
     "title": "Removing directory",
     "name": "RemoveDir",
-    "group": "Directories",
+    "group": "2__Directories",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -208,14 +338,14 @@ define({ "api": [
     },
     "version": "0.0.0",
     "filename": "./app/directory_remove.py",
-    "groupTitle": "Directories"
+    "groupTitle": "2__Directories"
   },
   {
     "type": "post",
     "url": "/get_file",
     "title": "Getting the file",
     "name": "GetFile",
-    "group": "Files",
+    "group": "3__Files",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -252,14 +382,14 @@ define({ "api": [
     },
     "version": "0.0.0",
     "filename": "./app/file_get.py",
-    "groupTitle": "Files"
+    "groupTitle": "3__Files"
   },
   {
     "type": "post",
     "url": "/remove_file",
     "title": "Delete the file",
     "name": "RemoveFile",
-    "group": "Files",
+    "group": "3__Files",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -289,14 +419,14 @@ define({ "api": [
     },
     "version": "0.0.0",
     "filename": "./app/file_deleting.py",
-    "groupTitle": "Files"
+    "groupTitle": "3__Files"
   },
   {
     "type": "post",
     "url": "/file_update",
     "title": "Update the file",
     "name": "UpdateFile",
-    "group": "Files",
+    "group": "3__Files",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -326,14 +456,14 @@ define({ "api": [
     },
     "version": "0.0.0",
     "filename": "./app/file_update.py",
-    "groupTitle": "Files"
+    "groupTitle": "3__Files"
   },
   {
     "type": "post",
     "url": "/upload",
     "title": "Upload the file",
     "name": "UploadFile",
-    "group": "Files",
+    "group": "3__Files",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -363,192 +493,6 @@ define({ "api": [
     },
     "version": "0.0.0",
     "filename": "./app/file_upload.py",
-    "groupTitle": "Files"
-  },
-  {
-    "type": "post",
-    "url": "/remove",
-    "title": "User deletion",
-    "name": "DelUser1",
-    "group": "User",
-    "parameter": {
-      "fields": {
-        "Parameter": [
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
-            "field": "username",
-            "description": "<p>Users name</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
-            "field": "password",
-            "description": "<p>Users password</p>"
-          }
-        ]
-      }
-    },
-    "version": "0.0.0",
-    "filename": "./app/remove.py",
-    "groupTitle": "User"
-  },
-  {
-    "type": "get",
-    "url": "/remove",
-    "title": "User deletion",
-    "name": "DelUser2",
-    "group": "User",
-    "parameter": {
-      "fields": {
-        "Parameter": [
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
-            "field": "cookie",
-            "description": "<p>Users cookie(automatically)</p>"
-          }
-        ]
-      }
-    },
-    "version": "0.0.0",
-    "filename": "./app/remove.py",
-    "groupTitle": "User"
-  },
-  {
-    "type": "post",
-    "url": "/registration",
-    "title": "New User Registration",
-    "name": "GetUser",
-    "group": "User",
-    "parameter": {
-      "fields": {
-        "Parameter": [
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
-            "field": "username",
-            "description": "<p>Users name</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
-            "field": "password",
-            "description": "<p>Users password</p>"
-          }
-        ]
-      }
-    },
-    "version": "0.0.0",
-    "filename": "./app/register.py",
-    "groupTitle": "User"
-  },
-  {
-    "type": "post",
-    "url": "/login",
-    "title": "User login",
-    "name": "LoginUser",
-    "group": "User",
-    "parameter": {
-      "fields": {
-        "Parameter": [
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
-            "field": "username",
-            "description": "<p>Users name</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
-            "field": "password",
-            "description": "<p>Users password</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "Success 200": [
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "cookie",
-            "description": "<p>Users cookie</p>"
-          }
-        ]
-      }
-    },
-    "version": "0.0.0",
-    "filename": "./app/login.py",
-    "groupTitle": "User"
-  },
-  {
-    "type": "get, post",
-    "url": "/logout",
-    "title": "User logout",
-    "name": "LogoutUser",
-    "group": "User",
-    "parameter": {
-      "fields": {
-        "Parameter": [
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
-            "field": "cookie",
-            "description": "<p>Users cookie(automatically)</p>"
-          }
-        ]
-      }
-    },
-    "version": "0.0.0",
-    "filename": "./app/logout.py",
-    "groupTitle": "User"
-  },
-  {
-    "type": "post",
-    "url": "/update",
-    "title": "User update",
-    "name": "UpdateUser",
-    "group": "User",
-    "parameter": {
-      "fields": {
-        "Parameter": [
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
-            "field": "cookie",
-            "description": "<p>Users cookie(automatically)</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": true,
-            "field": "username",
-            "description": "<p>Users new name</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": true,
-            "field": "password",
-            "description": "<p>Users new password</p>"
-          }
-        ]
-      }
-    },
-    "version": "0.0.0",
-    "filename": "./app/update.py",
-    "groupTitle": "User"
+    "groupTitle": "3__Files"
   }
 ] });
