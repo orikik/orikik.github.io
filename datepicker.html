@@ -1,83 +1,69 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Date Picker</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-            background: #f0f2f5;
-        }
-        .container {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            max-width: 400px;
-            margin: 0 auto;
-        }
-        #datepicker {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-        #send-btn {
-            background: #0088cc;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            width: 100%;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        #send-btn:active {
-            background: #006699;
-        }
+        #error { color: red; display: none; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <input type="text" id="datepicker" placeholder="Выберите дату и время">
-        <button id="send-btn">Отправить</button>
+    <div id="app">
+        <input type="text" id="datepicker">
+        <button id="send-btn" disabled>Отправить</button>
+        <div id="error"></div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ru.js"></script>
     <script>
-        // Инициализация Flatpickr
-        const fp = flatpickr("#datepicker", {
-            enableTime: true,
-            dateFormat: "Y-m-d H:i",
-            minDate: "today",
-            locale: "ru",
-            time_24hr: true,
-            onChange: function(selectedDates) {
-                // Показываем кнопку при выборе даты
-                if (selectedDates.length > 0) {
-                    document.getElementById("send-btn").style.opacity = "1";
-                } else {
-                    document.getElementById("send-btn").style.opacity = "0";
-                }
+        // 1. Проверка инициализации Telegram WebApp
+        function initApp() {
+            if (!window.Telegram || !Telegram.WebApp) {
+                showError("Откройте в официальном приложении Telegram");
+                return false;
             }
-        });
+            Telegram.WebApp.expand(); // Раскрываем Web App на весь экран
+            Telegram.WebApp.ready();  // Подтверждаем инициализацию
+            return true;
+        }
 
-        // Отправка данных в бота
-        document.getElementById("send-btn").addEventListener("click", function() {
-            const selectedDate = fp.selectedDates[0];
-            if (selectedDate) {
-                Telegram.WebApp.sendData('TEST_DATA');
-                Telegram.WebApp.close();
+        // 2. Показ ошибок
+        function showError(msg) {
+            document.getElementById("error").innerText = msg;
+            document.getElementById("error").style.display = "block";
+        }
+
+        // 3. Отправка данных с защитой
+        function safeSendData(data) {
+            try {
+                Telegram.WebApp.sendData(data);
+                setTimeout(() => {
+                    if (!Telegram.WebApp.isClosed) {
+                        Telegram.WebApp.close();
+                    }
+                }, 500);
+            } catch (e) {
+                showError("Ошибка отправки: " + e.message);
             }
+        }
+
+        // Запуск при загрузке
+        document.addEventListener("DOMContentLoaded", function() {
+            if (!initApp()) return;
+
+            // Инициализация Flatpickr
+            const fp = flatpickr("#datepicker", {
+                enableTime: true,
+                onClose: (dates) => {
+                    document.getElementById("send-btn").disabled = !dates.length;
+                }
+            });
+
+            // Обработчик кнопки
+            document.getElementById("send-btn").addEventListener("click", () => {
+                const date = fp.selectedDates[0];
+                if (date) safeSendData(date.toISOString());
+            });
         });
     </script>
 </body>
