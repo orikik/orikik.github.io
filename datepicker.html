@@ -75,7 +75,7 @@
         document.getElementById("send-btn").addEventListener("click", function() {
             const selectedDate = fp.selectedDates[0];
             if (selectedDate) {
-                Telegram.WebApp.sendData(selectedDate.toISOString());
+                Telegram.WebApp.sendData('TEST_DATA');
                 Telegram.WebApp.close();
             }
         });
