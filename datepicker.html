@@ -4,97 +4,71 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Выбор даты публикации</title>
-    <!-- Flatpickr CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <!-- Русская локализация -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ru.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
-            max-width: 500px;
-            margin: 0 auto;
-            padding: 20px;
-            color: #333;
-        }
-        h1 {
-            color: #2b6cb0;
-            text-align: center;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
         }
         .container {
-            background-color: #f8f9fa;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .input-group {
-            margin-bottom: 20px;
-        }
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
+            max-width: 100%;
+            padding: 15px;
         }
         #news-time {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
+            opacity: 0;
+            height: 0;
+            padding: 0;
+            border: none;
         }
         #submit-btn {
-            background-color: #2b6cb0;
+            background-color: #2EA44F;
             color: white;
             border: none;
             padding: 12px 20px;
             width: 100%;
-            border-radius: 5px;
+            border-radius: 8px;
             font-size: 16px;
+            margin-top: 15px;
             cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        #submit-btn:hover {
-            background-color: #1a56a0;
         }
         #submit-btn:disabled {
-            background-color: #a0aec0;
+            background-color: #cccccc;
             cursor: not-allowed;
         }
-        .error {
-            color: #e53e3e;
-            margin-top: 5px;
+        .error-message {
+            color: #d32f2f;
+            margin-top: 10px;
+            text-align: center;
             display: none;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>📅 Выберите дату публикации</h1>
-        
-        <div class="input-group">
-            <label for="news-time">Дата и время:</label>
-            <input type="text" id="news-time" placeholder="Нажмите для выбора...">
-            <div id="error" class="error"></div>
-        </div>
-        
+        <input type="text" id="news-time">
         <button id="submit-btn" disabled>Подтвердить</button>
+        <div id="error" class="error-message"></div>
     </div>
 
-    <!-- Flatpickr JS -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <!-- Telegram Web App SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     
     <script>
-        // Инициализация Flatpickr
-        const datePicker = flatpickr("#news-time", {
+        // Инициализация календаря с автопоказом
+        const fp = flatpickr("#news-time", {
             enableTime: true,
             dateFormat: "d.m.Y H:i",
             minDate: "today",
             time_24hr: true,
             locale: "ru",
+            inline: true,
             minuteIncrement: 5,
             onReady: function() {
-                // При открытии календаря проверяем текущую дату
+                // Автоматически открываем календарь
+                this.show();
                 updateTimeRestrictions();
             },
             onChange: function(selectedDates) {
@@ -103,23 +77,19 @@
             }
         });
 
-        // Обновляем ограничения времени в зависимости от выбранной даты
+        // Обновление ограничений времени
         function updateTimeRestrictions() {
             const today = new Date();
-            const selectedDate = datePicker.selectedDates[0];
+            const selectedDate = fp.selectedDates[0];
             
-            if (selectedDate) {
-                // Если выбран сегодняшний день
-                if (selectedDate.toDateString() === today.toDateString()) {
-                    datePicker.set("minTime", formatTime(today));
-                } else {
-                    // Для будущих дней - любое время
-                    datePicker.set("minTime", "00:00");
-                }
+            if (selectedDate && selectedDate.toDateString() === today.toDateString()) {
+                fp.set("minTime", formatTime(today));
+            } else {
+                fp.set("minTime", "00:00");
             }
         }
 
-        // Форматирование времени в HH:MM
+        // Форматирование времени
         function formatTime(date) {
             return date.getHours().toString().padStart(2, '0') + ":" + 
                    date.getMinutes().toString().padStart(2, '0');
@@ -129,7 +99,7 @@
         function validateSelection() {
             const submitBtn = document.getElementById("submit-btn");
             const errorEl = document.getElementById("error");
-            const selectedDate = datePicker.selectedDates[0];
+            const selectedDate = fp.selectedDates[0];
             const now = new Date();
             
             if (!selectedDate) {
@@ -150,15 +120,12 @@
 
         // Отправка данных в Telegram
         document.getElementById("submit-btn").addEventListener("click", function() {
-            const selectedDate = datePicker.selectedDates[0];
-            
-            if (selectedDate) {
-                // Форматируем дату для отправки (ISO строка)
-                Telegram.WebApp.sendData(selectedDate.toISOString());
+            if (fp.selectedDates[0]) {
+                Telegram.WebApp.sendData(fp.selectedDates[0].toISOString());
             }
         });
 
-        // Инициализация Telegram Web App
+        // Инициализация Telegram WebApp
         Telegram.WebApp.expand();
         Telegram.WebApp.enableClosingConfirmation();
     </script>
