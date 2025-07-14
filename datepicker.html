@@ -11,26 +11,19 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            padding: 20px;
-            background: #f5f5f5;
+            padding: 0;
             margin: 0;
+            background: white;
         }
         .container {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            max-width: 100%;
+            padding: 15px;
             box-sizing: border-box;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
         #datepicker {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-            box-sizing: border-box;
+            display: none; /* Скрываем input, так как календарь будет открыт сразу */
         }
         #send-btn {
             background: #0088cc;
@@ -41,8 +34,14 @@
             cursor: pointer;
             font-size: 16px;
             width: 100%;
+            margin-top: 15px;
             opacity: 0;
             transition: opacity 0.3s;
+            position: fixed;
+            bottom: 15px;
+            left: 15px;
+            right: 15px;
+            box-sizing: border-box;
         }
         #send-btn:disabled {
             background: #cccccc;
@@ -56,6 +55,12 @@
         }
         .flatpickr-calendar {
             font-family: Arial, sans-serif;
+            margin: 0 auto;
+            box-shadow: none;
+            border: none;
+        }
+        .flatpickr-months {
+            padding-top: 10px;
         }
     </style>
 </head>
@@ -123,6 +128,8 @@
                 locale: "ru",
                 time_24hr: true,
                 minuteIncrement: 1,
+                inline: true, // Календарь всегда виден
+                static: true, // Календарь встроен в страницу
                 onChange: function(selectedDates) {
                     const sendBtn = document.getElementById("send-btn");
                     if (selectedDates.length > 0) {
@@ -134,6 +141,9 @@
                     }
                 }
             });
+
+            // Открываем календарь сразу после инициализации
+            fp.open();
 
             // Обработчик кнопки отправки
             document.getElementById("send-btn").addEventListener("click", function() {
