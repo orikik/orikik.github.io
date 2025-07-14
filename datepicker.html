@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Date Picker</title>
     <!-- Flatpickr CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
@@ -14,7 +14,6 @@
             padding: 0;
             margin: 0;
             background: white;
-            touch-action: manipulation;
         }
         .container {
             padding: 15px;
@@ -24,7 +23,7 @@
             flex-direction: column;
         }
         #datepicker {
-            display: none;
+            display: none; /* Скрываем input, так как календарь будет открыт сразу */
         }
         #send-btn {
             background: #0088cc;
@@ -59,36 +58,39 @@
             margin: 0 auto;
             box-shadow: none;
             border: none;
-            width: 100%;
         }
         .flatpickr-months {
             padding-top: 10px;
         }
-        .flatpickr-time {
-            height: 60px;
-            display: flex;
-            align-items: center;
-        }
-        .flatpickr-time input {
-            font-size: 18px;
-            height: 40px;
-            -webkit-appearance: none;
-            margin: 0;
-        }
-        .numInputWrapper {
-            position: relative;
-            height: 40px;
-            width: 50px;
-            overflow: hidden;
-        }
-        .numInputWrapper span {
-            display: none;
-        }
-        .flatpickr-time .numInputWrapper {
-            margin: 0 5px;
-        }
-        .flatpickr-time-separator {
-            line-height: 40px;
+        /* Стили только для мобильных */
+        @media (hover: none) and (pointer: coarse) {
+            body {
+                touch-action: manipulation;
+            }
+            .flatpickr-time {
+                height: 60px;
+            }
+            .flatpickr-time input {
+                font-size: 18px;
+                height: 40px;
+                -webkit-appearance: none;
+                margin: 0;
+            }
+            .numInputWrapper {
+                position: relative;
+                height: 40px;
+                width: 50px;
+                overflow: hidden;
+            }
+            .numInputWrapper span {
+                display: none;
+            }
+            .flatpickr-time .numInputWrapper {
+                margin: 0 5px;
+            }
+            .flatpickr-time-separator {
+                line-height: 40px;
+            }
         }
     </style>
 </head>
@@ -99,23 +101,26 @@
         <div id="error-message"></div>
     </div>
 
+    <!-- Flatpickr JS -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <!-- Русская локализация -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ru.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/touch-pinch-zoom@2.3.4/dist/touch-pinch-zoom.min.js"></script>
 
     <script>
+        // 1. Проверка инициализации Telegram WebApp
         function initTelegramWebApp() {
             if (typeof Telegram === 'undefined' || !Telegram.WebApp) {
                 showError("Пожалуйста, откройте в официальном приложении Telegram");
                 return false;
             }
-            
+
             console.log("Telegram WebApp инициализирован. Версия:", Telegram.WebApp.version);
-            Telegram.WebApp.expand();
-            Telegram.WebApp.ready();
+            Telegram.WebApp.expand(); // Раскрываем на весь экран
+            Telegram.WebApp.ready();  // Подтверждаем готовность
             return true;
         }
 
+        // 2. Показ ошибок
         function showError(message) {
             const errorEl = document.getElementById("error-message");
             errorEl.textContent = message;
@@ -123,6 +128,7 @@
             console.error(message);
         }
 
+        // 3. Безопасная отправка данных
         function safeSendData(data) {
             try {
                 Telegram.WebApp.sendData(data);
@@ -136,31 +142,46 @@
             }
         }
 
+        // Проверка, что выбранная дата не в прошлом
         function isValidDate(selectedDate) {
             const now = new Date();
             return selectedDate.getTime() >= now.getTime();
         }
 
+        // Функция для определения минимального времени (текущее время для сегодняшнего дня)
         function minTimeForDate(date) {
             const today = new Date();
             today.setHours(0,0,0,0);
-            
+
             if (date.setHours(0,0,0,0) === today.getTime()) {
+                // Для сегодняшнего дня - текущее время
                 const hours = now.getHours();
                 const minutes = now.getMinutes() + 1;
                 return `${hours}:${minutes}`;
             }
+            // Для будущих дней - любое время
             return "00:00";
         }
 
+        function isMobileDevice() {
+            return (('ontouchstart' in window) ||
+               (navigator.maxTouchPoints > 0) ||
+               (navigator.msMaxTouchPoints > 0));
+        }
+
+        // Инициализация при загрузке
         document.addEventListener("DOMContentLoaded", function() {
+            // Проверяем Telegram WebApp
             if (!initTelegramWebApp()) {
+                // Для теста в браузере (если не в Telegram)
                 document.getElementById("send-btn").disabled = false;
             }
 
+            // Устанавливаем текущую дату +5 минут
             const now = new Date();
-            const defaultDate = new Date(now.getTime() + 5 * 60000);
+            const defaultDate = new Date(now.getTime() + 5 * 60000); // Добавляем 5 минут
 
+            // Инициализация Flatpickr с календарём и временем
             const fp = flatpickr("#datepicker", {
                 enableTime: true,
                 dateFormat: "Y-m-d H:i",
@@ -169,9 +190,9 @@
                 locale: "ru",
                 time_24hr: true,
                 minuteIncrement: 1,
-                defaultDate: defaultDate,
-                inline: true,
-                static: true,
+                defaultDate: defaultDate, // Устанавливаем дату по умолчанию
+                inline: true, // Календарь всегда виден
+                static: true, // Календарь встроен в страницу
                 onChange: function(selectedDates, dateStr, instance) {
                     const sendBtn = document.getElementById("send-btn");
                     if (selectedDates.length > 0 && isValidDate(selectedDates[0])) {
@@ -181,26 +202,31 @@
                         sendBtn.style.opacity = "0";
                         sendBtn.disabled = true;
                     }
-                    
+
+                    // Обновляем минимальное время при изменении даты
                     if (selectedDates.length > 0) {
                         instance.set("minTime", minTimeForDate(selectedDates[0]));
                     }
                 },
                 onMonthChange: function(selectedDates, dateStr, instance) {
+                    // Обновляем минимальное время при смене месяца
                     if (selectedDates.length > 0) {
                         instance.set("minTime", minTimeForDate(selectedDates[0]));
                     }
                 },
                 onOpen: function(selectedDates, dateStr, instance) {
+                    // Устанавливаем минимальное время при открытии календаря
                     if (selectedDates.length > 0) {
                         instance.set("minTime", minTimeForDate(selectedDates[0]));
                     }
-                    
-                    // Инициализация свайпа для времени
-                    initTimeScrolling();
+
+                    // Инициализация свайпа только для мобильных
+                    if (isMobileDevice()) {
+                        initTimeScrolling();
+                    }
                 }
             });
-
+            
             function initTimeScrolling() {
                 const timeInputs = document.querySelectorAll('.flatpickr-time input.numInput');
                 
@@ -222,7 +248,6 @@
                         if (Math.abs(step) > 0) {
                             let newValue = currentValue + step;
                             
-                            // Ограничения для часов и минут
                             if (input.classList.contains('flatpickr-hour')) {
                                 newValue = Math.min(23, Math.max(0, newValue));
                             } else if (input.classList.contains('flatpickr-minute')) {
@@ -238,27 +263,27 @@
                 });
             }
 
+            // Обработчик кнопки отправки
             document.getElementById("send-btn").addEventListener("click", function() {
                 const selectedDate = fp.selectedDates[0];
                 if (!selectedDate) {
                     showError("Пожалуйста, выберите дату и время");
                     return;
                 }
-                
+
+                // Дополнительная проверка перед отправкой
                 if (!isValidDate(selectedDate)) {
                     showError("Нельзя выбрать прошедшее время");
                     return;
                 }
-                
+
                 console.log("Отправка данных:", selectedDate.toISOString());
                 safeSendData(selectedDate.toISOString());
             });
 
+            // Активируем кнопку сразу, так как дата уже выбрана по умолчанию
             document.getElementById("send-btn").style.opacity = "1";
             document.getElementById("send-btn").disabled = false;
-            
-            // Инициализация свайпа при первой загрузке
-            setTimeout(initTimeScrolling, 500);
         });
     </script>
 </body>
