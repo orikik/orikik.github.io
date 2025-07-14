@@ -73,6 +73,8 @@
 
     <!-- Flatpickr JS -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <!-- Плагин для скроллинга -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/scrollPlugin.js"></script>
     <!-- Русская локализация -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ru.js"></script>
 
@@ -157,6 +159,12 @@
                 defaultDate: defaultDate, // Устанавливаем дату по умолчанию
                 inline: true, // Календарь всегда виден
                 static: true, // Календарь встроен в страницу
+                plugins: [
+                    new scrollPlugin({
+                        time: true,  // Включить скроллинг для времени
+                        touchScrollAllowed: true  // Разрешить скроллинг на тач-устройствах
+                    })
+                ],
                 onChange: function(selectedDates, dateStr, instance) {
                     const sendBtn = document.getElementById("send-btn");
                     if (selectedDates.length > 0 && isValidDate(selectedDates[0])) {
