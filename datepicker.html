@@ -120,6 +120,10 @@
                 document.getElementById("send-btn").disabled = false;
             }
 
+            // Устанавливаем текущую дату +5 минут
+            const now = new Date();
+            const defaultDate = new Date(now.getTime() + 5 * 60000); // Добавляем 5 минут
+
             // Инициализация Flatpickr с календарём и временем
             const fp = flatpickr("#datepicker", {
                 enableTime: true,
@@ -128,6 +132,7 @@
                 locale: "ru",
                 time_24hr: true,
                 minuteIncrement: 1,
+                defaultDate: defaultDate, // Устанавливаем дату по умолчанию
                 inline: true, // Календарь всегда виден
                 static: true, // Календарь встроен в страницу
                 onChange: function(selectedDates) {
@@ -142,9 +147,6 @@
                 }
             });
 
-            // Открываем календарь сразу после инициализации
-            fp.open();
-
             // Обработчик кнопки отправки
             document.getElementById("send-btn").addEventListener("click", function() {
                 const selectedDate = fp.selectedDates[0];
@@ -156,6 +158,10 @@
                 console.log("Отправка данных:", selectedDate.toISOString());
                 safeSendData(selectedDate.toISOString());
             });
+
+            // Активируем кнопку сразу, так как дата уже выбрана по умолчанию
+            document.getElementById("send-btn").style.opacity = "1";
+            document.getElementById("send-btn").disabled = false;
         });
     </script>
 </body>
