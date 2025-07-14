@@ -3,131 +3,198 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Выбор даты публикации</title>
+    <title>Date Picker</title>
+    <!-- Flatpickr CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ru.js"></script>
+    <!-- Telegram WebApp JS -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 0;
             padding: 0;
-            background-color: #f5f5f5;
+            margin: 0;
+            background: white;
         }
         .container {
-            max-width: 100%;
             padding: 15px;
+            box-sizing: border-box;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
-        #news-time {
-            opacity: 0;
-            height: 0;
-            padding: 0;
-            border: none;
+        #datepicker {
+            display: none; /* Скрываем input, так как календарь будет открыт сразу */
         }
-        #submit-btn {
-            background-color: #2EA44F;
+        #send-btn {
+            background: #0088cc;
             color: white;
             border: none;
-            padding: 12px 20px;
-            width: 100%;
+            padding: 12px;
             border-radius: 8px;
-            font-size: 16px;
-            margin-top: 15px;
             cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            margin-top: 15px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            position: fixed;
+            bottom: 15px;
+            left: 15px;
+            right: 15px;
+            box-sizing: border-box;
         }
-        #submit-btn:disabled {
-            background-color: #cccccc;
+        #send-btn:disabled {
+            background: #cccccc;
             cursor: not-allowed;
         }
-        .error-message {
-            color: #d32f2f;
-            margin-top: 10px;
-            text-align: center;
+        #error-message {
+            color: #ff3333;
+            margin-top: 15px;
             display: none;
+            font-size: 14px;
+        }
+        .flatpickr-calendar {
+            font-family: Arial, sans-serif;
+            margin: 0 auto;
+            box-shadow: none;
+            border: none;
+        }
+        .flatpickr-months {
+            padding-top: 10px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <input type="text" id="news-time">
-        <button id="submit-btn" disabled>Подтвердить</button>
-        <div id="error" class="error-message"></div>
+        <input type="text" id="datepicker" placeholder="Выберите дату и время">
+        <button id="send-btn" disabled>Отправить боту</button>
+        <div id="error-message"></div>
     </div>
 
+    <!-- Flatpickr JS -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    
+    <!-- Русская локализация -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ru.js"></script>
+
     <script>
-        // Инициализация календаря с автопоказом
-        const fp = flatpickr("#news-time", {
-            enableTime: true,
-            dateFormat: "d.m.Y H:i",
-            minDate: "today",
-            time_24hr: true,
-            locale: "ru",
-            inline: true,
-            minuteIncrement: 5,
-            onReady: function() {
-                // Автоматически открываем календарь
-                this.show();
-                updateTimeRestrictions();
-            },
-            onChange: function(selectedDates) {
-                updateTimeRestrictions();
-                validateSelection();
+        // 1. Проверка инициализации Telegram WebApp
+        function initTelegramWebApp() {
+            if (typeof Telegram === 'undefined' || !Telegram.WebApp) {
+                showError("Пожалуйста, откройте в официальном приложении Telegram");
+                return false;
             }
-        });
-
-        // Обновление ограничений времени
-        function updateTimeRestrictions() {
-            const today = new Date();
-            const selectedDate = fp.selectedDates[0];
             
-            if (selectedDate && selectedDate.toDateString() === today.toDateString()) {
-                fp.set("minTime", formatTime(today));
-            } else {
-                fp.set("minTime", "00:00");
+            console.log("Telegram WebApp инициализирован. Версия:", Telegram.WebApp.version);
+            Telegram.WebApp.expand(); // Раскрываем на весь экран
+            Telegram.WebApp.ready();  // Подтверждаем готовность
+            return true;
+        }
+
+        // 2. Показ ошибок
+        function showError(message) {
+            const errorEl = document.getElementById("error-message");
+            errorEl.textContent = message;
+            errorEl.style.display = "block";
+            console.error(message);
+        }
+
+        // 3. Безопасная отправка данных
+        function safeSendData(data) {
+            try {
+                Telegram.WebApp.sendData(data);
+                setTimeout(() => {
+                    if (Telegram.WebApp && !Telegram.WebApp.isClosed) {
+                        Telegram.WebApp.close();
+                    }
+                }, 300);
+            } catch (e) {
+                showError("Ошибка отправки: " + e.message);
             }
         }
 
-        // Форматирование времени
-        function formatTime(date) {
-            return date.getHours().toString().padStart(2, '0') + ":" + 
-                   date.getMinutes().toString().padStart(2, '0');
-        }
+        // Инициализация при загрузке
+        document.addEventListener("DOMContentLoaded", function() {
+            // Проверяем Telegram WebApp
+            if (!initTelegramWebApp()) {
+                // Для теста в браузере (если не в Telegram)
+                document.getElementById("send-btn").disabled = false;
+            }
 
-        // Валидация выбора
-        function validateSelection() {
-            const submitBtn = document.getElementById("submit-btn");
-            const errorEl = document.getElementById("error");
-            const selectedDate = fp.selectedDates[0];
+            // Устанавливаем текущую дату +5 минут
             const now = new Date();
-            
-            if (!selectedDate) {
-                errorEl.style.display = "none";
-                submitBtn.disabled = true;
-                return;
-            }
-            
-            if (selectedDate < now) {
-                errorEl.textContent = "⏰ Нельзя выбрать прошедшее время!";
-                errorEl.style.display = "block";
-                submitBtn.disabled = true;
-            } else {
-                errorEl.style.display = "none";
-                submitBtn.disabled = false;
-            }
-        }
+            const defaultDate = new Date(now.getTime() + 5 * 60000); // Добавляем 5 минут
 
-        // Отправка данных в Telegram
-        document.getElementById("submit-btn").addEventListener("click", function() {
-            if (fp.selectedDates[0]) {
-                Telegram.WebApp.sendData(fp.selectedDates[0].toISOString());
+            // Функция для определения минимального времени (текущее время для сегодняшнего дня)
+            function minTimeForDate(date) {
+                const today = new Date();
+                today.setHours(0,0,0,0);
+                
+                if (date.setHours(0,0,0,0) === today.getTime()) {
+                    // Для сегодняшнего дня - текущее время
+                    const hours = now.getHours();
+                    const minutes = now.getMinutes();
+                    return `${hours}:${minutes}`;
+                }
+                // Для будущих дней - любое время
+                return "00:00";
             }
+
+            // Инициализация Flatpickr с календарём и временем
+            const fp = flatpickr("#datepicker", {
+                enableTime: true,
+                dateFormat: "Y-m-d H:i",
+                minDate: "today",
+                locale: "ru",
+                time_24hr: true,
+                minuteIncrement: 1,
+                defaultDate: defaultDate, // Устанавливаем дату по умолчанию
+                inline: true, // Календарь всегда виден
+                static: true, // Календарь встроен в страницу
+                onChange: function(selectedDates, dateStr, instance) {
+                    const sendBtn = document.getElementById("send-btn");
+                    if (selectedDates.length > 0) {
+                        sendBtn.style.opacity = "1";
+                        sendBtn.disabled = false;
+                    } else {
+                        sendBtn.style.opacity = "0";
+                        sendBtn.disabled = true;
+                    }
+                    
+                    // Обновляем минимальное время при изменении даты
+                    if (selectedDates.length > 0) {
+                        instance.set("minTime", minTimeForDate(selectedDates[0]));
+                    }
+                },
+                onMonthChange: function(selectedDates, dateStr, instance) {
+                    // Обновляем минимальное время при смене месяца
+                    if (selectedDates.length > 0) {
+                        instance.set("minTime", minTimeForDate(selectedDates[0]));
+                    }
+                },
+                onOpen: function(selectedDates, dateStr, instance) {
+                    // Устанавливаем минимальное время при открытии календаря
+                    if (selectedDates.length > 0) {
+                        instance.set("minTime", minTimeForDate(selectedDates[0]));
+                    }
+                }
+            });
+
+            // Обработчик кнопки отправки
+            document.getElementById("send-btn").addEventListener("click", function() {
+                const selectedDate = fp.selectedDates[0];
+                if (!selectedDate) {
+                    showError("Пожалуйста, выберите дату и время");
+                    return;
+                }
+                
+                console.log("Отправка данных:", selectedDate.toISOString());
+                safeSendData(selectedDate.toISOString());
+            });
+
+            // Активируем кнопку сразу, так как дата уже выбрана по умолчанию
+            document.getElementById("send-btn").style.opacity = "1";
+            document.getElementById("send-btn").disabled = false;
         });
-
-        // Инициализация Telegram WebApp
-        Telegram.WebApp.expand();
-        Telegram.WebApp.enableClosingConfirmation();
     </script>
 </body>
 </html>
