@@ -112,6 +112,12 @@
             }
         }
 
+        // Проверка, что выбранная дата не в прошлом
+        function isValidDate(selectedDate) {
+            const now = new Date();
+            return selectedDate.getTime() >= now.getTime();
+        }
+
         // Инициализация при загрузке
         document.addEventListener("DOMContentLoaded", function() {
             // Проверяем Telegram WebApp
@@ -132,7 +138,7 @@
                 if (date.setHours(0,0,0,0) === today.getTime()) {
                     // Для сегодняшнего дня - текущее время
                     const hours = now.getHours();
-                    const minutes = now.getMinutes();
+                    const minutes = now.getMinutes() + 1;
                     return `${hours}:${minutes}`;
                 }
                 // Для будущих дней - любое время
@@ -153,7 +159,7 @@
                 static: true, // Календарь встроен в страницу
                 onChange: function(selectedDates, dateStr, instance) {
                     const sendBtn = document.getElementById("send-btn");
-                    if (selectedDates.length > 0) {
+                    if (selectedDates.length > 0 && isValidDate(selectedDates[0])) {
                         sendBtn.style.opacity = "1";
                         sendBtn.disabled = false;
                     } else {
@@ -185,6 +191,12 @@
                 const selectedDate = fp.selectedDates[0];
                 if (!selectedDate) {
                     showError("Пожалуйста, выберите дату и время");
+                    return;
+                }
+                
+                // Дополнительная проверка перед отправкой
+                if (!isValidDate(selectedDate)) {
+                    showError("Нельзя выбрать прошедшее время");
                     return;
                 }
                 
