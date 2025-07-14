@@ -129,7 +129,18 @@
                 enableTime: true,
                 dateFormat: "Y-m-d H:i",
                 minDate: "today",
-                minTime: new Date().getHours() + ":" + new Date().getMinutes(),
+                onDayCreate: function(dObj, dStr, fp, dayElem) {
+                    const today = new Date();
+                    const selectedDate = new Date(dayElem.dateObj);
+                    
+                    // Если выбран сегодняшний день, устанавливаем minTime = текущее время
+                    if (selectedDate.toDateString() === today.toDateString()) {
+                        fp.set("minTime", today.getHours() + ":" + today.getMinutes());
+                    } else {
+                        // Для остальных дней — время любое
+                        fp.set("minTime", "00:00");
+                    }
+                }
                 locale: "ru",
                 time_24hr: true,
                 minuteIncrement: 1,
